@@ -1,39 +1,15 @@
-"use client"
-import { Button } from "@heroui/button";
-import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+"use client";
+import Footer from "@/components/footer";
+import { Login } from "@/components/login";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const [login, setLogin] = useState(false); // <-- use state
-  const { data: session } = useSession();
-
-  const loginToSpotify = () => {
-    signIn("spotify"); // this will redirect to Spotify login
-    setLogin(!login)
-  }
+  const { data: session, status } = useSession();
 
   return (
     <div className="min-h-screen flex flex-col justify-between">
-      <div className="flex-grow flex flex-col items-center justify-center">
-        <div className="p-4 text-xl">Login to Spotify</div>
-        <div>
-          <Button
-            onPress={() => signIn("spotify")}
-            variant="flat"
-            radius="md"
-          >
-            Login
-          </Button>
-        </div>
-      </div>
-
-      <div className="p-4 text-xs text-center font-extralight">
-        {session ? (
-          <div className="text-green-500">logged in.</div>
-        ) : (
-          <div className="text-red-500">not logged in.</div>
-        )}
-      </div>
+      {!session && <Login session={session} status={status} />}
+      <Footer session={session} />
     </div>
   );
 }
