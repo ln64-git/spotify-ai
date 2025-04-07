@@ -25,7 +25,7 @@ export default function Home() {
         </div>
       )}
 
-      <Footer session={session} />
+      {/* <Footer session={session} /> */}
     </div>
   );
 }
