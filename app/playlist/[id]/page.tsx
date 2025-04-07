@@ -1,20 +1,21 @@
+// app/playlist/[id]/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { fetchPlaylist } from "@/spotify/fetchPlaylists";
 
 interface PlaylistPageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default async function PlaylistPage(props: PlaylistPageProps) {
-  const params = await props.params;
+  const params = await Promise.resolve(props.params);
   const session = await getServerSession(authOptions);
+  const accessToken = (session as any)?.accessToken;
 
-  if (!session || !(session as any).accessToken) {
+  if (!accessToken) {
     redirect("/");
   }
-
-  const accessToken = (session as any).accessToken;
 
   const playlist = await fetchPlaylist(params.id, accessToken);
 
@@ -47,21 +48,3 @@ export default async function PlaylistPage(props: PlaylistPageProps) {
   );
 }
 
-// ✅ Safe server-side fetch with error handling
-async function fetchPlaylist(id: string, accessToken: string) {
-  try {
-    const res = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      cache: "no-store", // optional: disables Next.js cache
-    });
-
-    if (!res.ok) return null;
-
-    return await res.json();
-  } catch (error) {
-    console.error("Failed to fetch playlist:", error);
-    return null;
-  }
-}
