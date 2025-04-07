@@ -3,10 +3,11 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 
 interface PlaylistPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default async function PlaylistPage({ params }: PlaylistPageProps) {
+export default async function PlaylistPage(props: PlaylistPageProps) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
 
   if (!session || !(session as any).accessToken) {
